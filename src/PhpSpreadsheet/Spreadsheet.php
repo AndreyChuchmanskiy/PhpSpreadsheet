@@ -200,6 +200,13 @@ class Spreadsheet
     private $tabRatio = 600;
 
     /**
+     * Specifies needless of collecting garbage.
+     *
+     * @var bool
+     */
+    private $useGarbageCollection = true;
+
+    /**
      * The workbook has macros ?
      *
      * @return bool
@@ -1307,11 +1314,25 @@ class Spreadsheet
     }
 
     /**
+     * Set garbage collection status.
+     *
+     * @param $pValue
+     */
+    public function setGarbageCollect($pValue)
+    {
+        $this->useGarbageCollection = $pValue;
+    }
+
+    /**
      * Eliminate all unneeded cellXf and afterwards update the xfIndex for all cells
      * and columns in the workbook.
      */
     public function garbageCollect(): void
     {
+        if (!$this->useGarbageCollection) {
+            return;
+        }
+
         // how many references are there to each cellXf ?
         $countReferencesCellXf = [];
         foreach ($this->cellXfCollection as $index => $cellXf) {
