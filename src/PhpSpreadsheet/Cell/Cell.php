@@ -65,6 +65,13 @@ class Cell
     private $formulaAttributes;
 
     /**
+     * Attribute for formula pre-calculation.
+     *
+     * @var mixed
+     */
+    private $preCalculatedValue;
+
+    /**
      * Update the cell into the cell collection.
      *
      * @return self
@@ -208,7 +215,7 @@ class Cell
                 break;
             case DataType::TYPE_STRING2:
                 $pDataType = DataType::TYPE_STRING;
-                // no break
+            // no break
             case DataType::TYPE_STRING:
                 // Synonym for string
             case DataType::TYPE_INLINE:
@@ -257,6 +264,10 @@ class Cell
     {
         if ($this->dataType == DataType::TYPE_FORMULA) {
             try {
+                if (null !== $this->preCalculatedValue) {
+                    return $this->preCalculatedValue;
+                }
+
                 $result = Calculation::getInstance(
                     $this->getWorksheet()->getParent()
                 )->calculateCellValue($this, $resetLog);
@@ -299,6 +310,23 @@ class Cell
     {
         if ($pValue !== null) {
             $this->calculatedValue = (is_numeric($pValue)) ? (float) $pValue : $pValue;
+        }
+
+        return $this->updateInCollection();
+    }
+
+    /**
+     * Set pre-calculated value.
+     *
+     * @param mixed $pValue Value
+     *
+     * @return Cell
+     */
+    public function setPreCalculatedValue($pValue)
+    {
+        if ($pValue !== null) {
+            $this->preCalculatedValue = (is_numeric($pValue)) ? (float) $pValue : $pValue;
+            $this->setCalculatedValue($this->preCalculatedValue);
         }
 
         return $this->updateInCollection();
@@ -577,7 +605,7 @@ class Cell
 
         // Verify if cell is in range
         return ($rangeStart[0] <= $myColumn) && ($rangeEnd[0] >= $myColumn) &&
-                ($rangeStart[1] <= $myRow) && ($rangeEnd[1] >= $myRow);
+            ($rangeStart[1] <= $myRow) && ($rangeEnd[1] >= $myRow);
     }
 
     /**
