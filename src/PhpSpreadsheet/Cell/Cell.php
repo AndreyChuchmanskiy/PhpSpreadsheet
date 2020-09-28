@@ -331,6 +331,23 @@ class Cell
     }
 
     /**
+     * Set pre-calculated value.
+     *
+     * @param mixed $pValue Value
+     *
+     * @return Cell
+     */
+    public function setPreCalculatedValue($pValue)
+    {
+        if ($pValue !== null) {
+            $this->preCalculatedValue = (is_numeric($pValue)) ? (float) $pValue : $pValue;
+            $this->setCalculatedValue($this->preCalculatedValue);
+        }
+
+        return $this->updateInCollection();
+    }
+
+    /**
      *    Get old calculated value (cached)
      *    This returns the value last calculated by MS Excel or whichever spreadsheet program was used to
      *        create the original spreadsheet file.
